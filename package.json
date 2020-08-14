@@ -1,0 +1,26 @@
+{
+  "name": "404game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Entry for js13kGames",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MilanDonhowe/404Game.git"
+  },
+  "author": "Milan Donhowe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MilanDonhowe/404Game/issues"
+  },
+  "homepage": "https://github.com/MilanDonhowe/404Game#readme",
+  "devDependencies": {
+    "ts-loader": "^8.0.2",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  }
+}
