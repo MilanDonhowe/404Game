@@ -1,5 +1,10 @@
-// Level parser
+// FUCK PARSING
 
-export function parseTuple(tuple_str: string): [number, number] {
-    return [0, 0];
+export interface Level {
+    readonly row: number;
+    readonly col: number;
+    readonly tile_values: number[];
+    readonly tile_cords: number[][];
+    readonly blocks?: number[][];
+    readonly holes?: number[][];
 }
