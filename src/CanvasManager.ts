@@ -7,7 +7,8 @@ import {Level} from "./level_parser.ts";
 import {INPUT} from "./InputManager.ts";
 import {
     Block, Tile, Hole, Entity, EntityRequest, 
-    RequestType, EntityResponseType, EntityResponse
+    RequestType, ResponseType, EntityResponse,
+    EntityType
 } from "./entity.ts";
 
 // Should be responsible for keeping track of all entities
@@ -15,33 +16,33 @@ import {
 
 
 
-
 export class CanvasManager {
     // entity pool
-    private entity_pool: Entity[];
-
-    private grid_height: number;
-    private grid_width: number;
+    static entity_pool: Entity[];
 
 
+    static step_entities : boolean = true;
     private input_queue : INPUT[];
 
-    private canvas: HTMLCanvasElement;
-    private context: CanvasRenderingContext2D;
+    static canvas: HTMLCanvasElement;
+    static context: CanvasRenderingContext2D;
 
     // https://kernhanda.github.io/tutorial-typescript-canvas-drawing/ -> Good Canvas Tutorial for working with typescript.
     constructor (){
-        this.canvas = document.getElementById('screen') as HTMLCanvasElement;
-        this.context = this.canvas.getContext("2d");
-        this.entity_pool = [];
+        CanvasManager.canvas = document.getElementById('screen') as HTMLCanvasElement;
+        CanvasManager.context = CanvasManager.canvas.getContext("2d");
+        CanvasManager.entity_pool = [];
         this.input_queue = [];
     }
 
-    load_entity_grid(lvl: Level){
+
+
+    static load_entity_grid(lvl: Level){
         const block_size : number = 64;
         console.log(lvl);
-        this.context.canvas.height = lvl.row * block_size;
-        this.context.canvas.width = lvl.col * block_size;
+        CanvasManager.context.canvas.height = lvl.row * block_size;
+        CanvasManager.context.canvas.width = lvl.col * block_size;
+        
         // add solids
         let pos : [number, number];
         if (lvl.blocks){
@@ -49,7 +50,7 @@ export class CanvasManager {
                 pos = [lvl.blocks[i][0], lvl.blocks[i][1]];
                 console.log(`Adding new block @ ${pos[0]}, ${pos[1]}`)
 
-                this.entity_pool.push(new Block(pos));
+                CanvasManager.entity_pool.push(new Block(pos));
             }
         }
         // add tiles
@@ -57,13 +58,13 @@ export class CanvasManager {
             pos = [lvl.tile_cords[i][0], lvl.tile_cords[i][1]];
             console.log(`Adding new tile @ ${pos[0]}, ${pos[1]}`)
 
-            this.entity_pool.push(new Tile(pos, lvl.tile_values[i]));
+            CanvasManager.entity_pool.push(new Tile(pos, lvl.tile_values[i]));
         }
         // add holes
         if (lvl.holes){
             for (let i=0; i < lvl.holes.length; i++){
                 pos = [lvl.holes[i][0], lvl.holes[i][1]];
-                this.entity_pool.push(new Hole(pos));
+                CanvasManager.entity_pool.push(new Hole(pos));
             }
         }
         console.log("Successfully loaded level into entity pool!");
@@ -72,29 +73,51 @@ export class CanvasManager {
 
     // Clears Canvas Screen.
     cls(): void{
-        this.context.fillStyle = "#000000";
-        this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+        CanvasManager.context.fillStyle = "#dddddd";
+        CanvasManager.context.fillRect(0, 0, CanvasManager.context.canvas.width, CanvasManager.context.canvas.height);
     }
 
     // Updates each object by a tick.
     // Input can be either a direction or 
     step(inp : INPUT){
-        if (inp != INPUT.NOTHING){
-            console.log("Adding item to the input queue!");
-            this.input_queue.push(inp);
+        if (CanvasManager.step_entities){
+            if (inp != INPUT.NOTHING){
+                this.input_queue.push(inp);
+            }
+            // Then if nothing is busy we perform a new action
+            if (!this.busy() && (this.input_queue.length > 0)){
+                this.use_input();
+            }
+            for (let i=0;i<CanvasManager.entity_pool.length;i++){
+                CanvasManager.entity_pool[i].step();
+            }
+        } else {
+            CanvasManager.entity_pool[CanvasManager.entity_pool.length-1].step();
         }
-        // Then if nothing is busy we perform a new action
-        if (!this.busy() && (this.input_queue.length > 0)){
-            this.use_input();
-        }
-
     }
 
 
     use_input(){
         const input : INPUT = this.input_queue.shift();
-        for (let i=0; i < this.entity_pool.length; i++){
-         let resp : EntityResponse = this.entity_pool[i].ask({option:RequestType.Move, dir:input});
+        // filter items
+        switch(input){
+            case INPUT.UP:
+                CanvasManager.entity_pool.sort( (e1, e2) => e1.coordinates[1] - e2.coordinates[1] );
+                break;
+            case INPUT.DOWN:
+                CanvasManager.entity_pool.sort( (e1, e2) => -1*(e1.coordinates[1] - e2.coordinates[1]));
+                break;
+            case INPUT.LEFT:
+                CanvasManager.entity_pool.sort( (e1, e2) => e1.coordinates[0] - e2.coordinates[0] );
+                break;
+            case INPUT.RIGHT:
+                CanvasManager.entity_pool.sort( (e1, e2) => -1*(e1.coordinates[0] - e2.coordinates[0]));
+                break;
+
+        }
+
+        for (let i=0; i < CanvasManager.entity_pool.length; i++){
+         let resp : EntityResponse = CanvasManager.entity_pool[i].ask({type:RequestType.Move, dir:input});
             // maybe do something with response idk
         }
 
@@ -104,22 +127,19 @@ export class CanvasManager {
     draw(){
         // clear the screen
         this.cls();
-        for (let i=0; i < this.entity_pool.length; i++){
-            this.entity_pool[i].draw(this.context);
+        for (let i=0; i < CanvasManager.entity_pool.length; i++){
+            CanvasManager.entity_pool[i].draw(CanvasManager.context);
         }
     }
 
-    move(dir: INPUT){
-        // move item
-    }
 
     // Checks if any entity is currently in a process.
     busy(): boolean{
-        for (let i = 0; i < this.entity_pool.length; i++){
+        for (let i = 0; i < CanvasManager.entity_pool.length; i++){
 
-            let entity_status : EntityResponse = this.entity_pool[i].ask({option: RequestType.Status});
+            let entity_status : EntityResponse = CanvasManager.entity_pool[i].ask({type: RequestType.Status});
 
-            if (entity_status.type == EntityResponseType.Busy){
+            if (entity_status.type == ResponseType.Busy){
                 return true;
             }
 
@@ -127,14 +147,35 @@ export class CanvasManager {
         return false;
     }
 
+    static entityAt(x: number, y: number): number{
+        for (let i=0; i < CanvasManager.entity_pool.length; i++){
+            //if (CanvasManager.entity_pool[i].ask({type:RequestType.ID}) == {type:ResponseType.ID, success_value:e_type}){
+                if (CanvasManager.entity_pool[i].coordinates[0] == x && CanvasManager.entity_pool[i].coordinates[1] == y){
+                    return i;
+                }
+            //}
+        }
+        return -1;
+    }
+
+    // [x, y]
+    static checkBorderCollision(cords: [number, number]): boolean{
+        //console.log(`grid_w = ${CanvasManager.grid_width}, grid_h = ${CanvasManager.grid_height}`);
+        //console.log(`cords = ${cords[0]}, ${cords[1]}`);
+        if (cords[0] > CanvasManager.canvas.width -64 || cords[0] < 0){
+            return true;
+        }
+        if (cords[1] > CanvasManager.canvas.height -64 || cords[1] < 0){
+            return true;
+        }
+        
+        return false;   
+    }
+    static delAt(index: number){
+        console.log(`Deleting Object @ ${index}`);
+        CanvasManager.entity_pool.splice(index, 1);
+    }
+
 }
 
-// Okay, so how am I going to do collision checking for each block (to determine merges and such?)
-/*
-    FORGET THE ENTITY POOL, LET'S USE AN ENTITY GRID
-*/
-
 // An external function or object should be calling a event loop where the Canvas Manager step() && draw() events get called.
-
-// DOES OBJECT EXIST @ COORDINATES? YES/NO PLEASE
-//function entityAT(location: [number, number], pool: Entity[]): boolean {}

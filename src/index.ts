@@ -11,6 +11,8 @@ import {CanvasManager} from "./CanvasManager.ts";
 
 import {InputManager} from "./InputManager.ts";
 
+import {GameManager} from "./GameManager.ts"; 
+
 import test_level from "./levels/level_test.json";
 
 
@@ -21,6 +23,8 @@ import test_level from "./levels/level_test.json";
 // TODO: change this.
 const cnv = new CanvasManager();
 const inp = new InputManager();
+const gm = new GameManager(); // Game Manager
+
 document.addEventListener('keydown', inp);
 document.addEventListener('keyup', inp);
 
@@ -28,10 +32,13 @@ document.addEventListener('keyup', inp);
 
 const lvl : Level = test_level;
 
-cnv.load_entity_grid(test_level);
+//CanvasManager.load_entity_grid(test_level);
+
+CanvasManager.load_entity_grid(gm.get_level());
 
 /* Main Event Loop */
 setInterval( (e: Event) => {
+    gm.step();
     cnv.step(inp.step());
     cnv.draw();
 }, 16);

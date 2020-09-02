@@ -1,28 +1,10 @@
-  ______________________
- /----------------------\
-/-<{Actions for Friday}>-\
-\________________________/
+  ________________________
+ /------------------------\
+/-<{Actions for Thursday}>-\
+\__________________________/
 
-=> Refactor entity pool as a global array.
-Basically seperate out the CanvasManager into a bunch
-of functions.
-=> Add CRUD capabilities to entity pool.
-
-Add collision check function which works like so:
-
-function checkCollision(x, y, entity_pool){
-    for each object in entity_pool:
-        if the object is at (x,y)
-            return {index of object}
-    return false (specified as no-collision)
-}
-
-Yeah let's function the fuck out of this.
-
-Other things:
--> Make GameManager class (holds score, win/lose conditions, etc.)
--> Figure out graphics
--> center canvas element
-
-L8R:
--> Work on finding optimizations for typescript compiler.
+\-> Add Hole Game-Over mechanics
+\-> Add Win-Screen
+|-> Add Lose-Screen
+/-> Further Modularize entities (maybe a seperate folder)
+/-> Add audio.

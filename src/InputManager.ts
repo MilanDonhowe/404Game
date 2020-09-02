@@ -2,7 +2,7 @@
 Filename: InputManager.ts
 Author: Milan
 Desc: Implements InputManager class which should handle all input event listeners used in game.
-      Relays current input state to CanvasManager every step() event.
+      Relays current input state to CanvasManager every step() event
 
 */
 
