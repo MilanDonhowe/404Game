@@ -8,20 +8,22 @@ Desc: Singleton responsible for keeping track of game state
 */
 import {CanvasManager} from "./CanvasManager.ts";
 import {Level} from "./level_parser.ts";
-import {EntityResponse, ResponseType, RequestType, TransitionBegin, TransitionEnd} from "./entity.ts";
+import {EntityResponse, ResponseType, RequestType} from "./entities/entity.ts";
+import {TransitionIn, TransitionOut, TransitionOutLevelRestart, TransitionInLevelRestart} from "./entities/transitions.ts";
 import level_1 from "./levels/level_1.json";
 import level_2 from "./levels/level_2.json";
 
 
 export enum GameState {
       LEVEL_LOSS,
+      LEVEL_LOSS_TRANSITON,
       LEVEL_WIN,
       LEVEL_ONGOING,
       GAME_WIN,
       LEVEL_TRANSITION_START,
-      LEVEL_TRANSITION_LOAD_1,
-      LEVEL_TRANISITION_LOAD_2,
-      LEVEL_TRANSITION_END
+      LEVEL_TRANSITION_LOAD,
+      LEVEL_TRANSITION_END,
+      TRANSITION_WAIT
 };
 
 
@@ -62,23 +64,44 @@ export class GameManager{
                               let e_score : EntityResponse = CanvasManager.entity_pool[i].ask({type:RequestType.Points});
                               if (e_score.success_value == 404){
                                     // ADD TRANSITION START ELEMENT TO THE ENTITY POOL
-                                    CanvasManager.entity_pool.push(new TransitionBegin(CanvasManager.context.canvas.width));
+                                    CanvasManager.entity_pool.push(new TransitionIn(CanvasManager.context.canvas.width, GameState.LEVEL_TRANSITION_LOAD, "#000000"));
                                     CanvasManager.step_entities = false;
                                     GameManager.STATE = GameState.LEVEL_TRANSITION_START;
                                     break;
                               }
                         }
                         break;
-                  case GameState.LEVEL_TRANSITION_LOAD_1:
+
+
+                  case GameState.LEVEL_TRANSITION_LOAD:
                         this.load_next_level();
-                        CanvasManager.entity_pool.push(new TransitionEnd(CanvasManager.context.canvas.width));
-                        GameManager.STATE = GameState.LEVEL_TRANISITION_LOAD_2;
+                        CanvasManager.entity_pool.push(new TransitionOut(CanvasManager.context.canvas.width, GameState.LEVEL_TRANSITION_END, "#000000"));
+                        GameManager.STATE = GameState.TRANSITION_WAIT;
                         break;
+
+
                   case GameState.LEVEL_TRANSITION_END:
                         GameManager.STATE = GameState.LEVEL_ONGOING;
                         CanvasManager.step_entities = true;
                         CanvasManager.delAt(CanvasManager.entity_pool.length-1);
                         break;
+
+
+                  case GameState.LEVEL_LOSS:
+                        CanvasManager.step_entities = false;
+                        CanvasManager.entity_pool.push(new TransitionOutLevelRestart(CanvasManager.context.canvas.width, GameState.LEVEL_LOSS_TRANSITON, "#fc4225"));
+                        GameManager.STATE = GameState.TRANSITION_WAIT;
+                        break;
+
+
+                  case GameState.LEVEL_LOSS_TRANSITON:
+                        CanvasManager.entity_pool = [];
+                        CanvasManager.load_entity_grid(this.get_level());
+                        CanvasManager.entity_pool.push(new TransitionInLevelRestart(CanvasManager.context.canvas.width, GameState.LEVEL_TRANSITION_END, "#fc4225"));
+                        GameManager.STATE = GameState.TRANSITION_WAIT;
+                        break;
+                  
+
             }
 
       }

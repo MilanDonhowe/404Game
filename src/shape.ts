@@ -8,7 +8,6 @@ export function roundRect(ctx:CanvasRenderingContext2D,  x: number, y: number, w
 
     ctx.beginPath();
 
-
     //top-left corner
     ctx.moveTo(x, y+c);
     ctx.quadraticCurveTo(x, y, x+c, y);
@@ -29,7 +28,8 @@ export function roundRect(ctx:CanvasRenderingContext2D,  x: number, y: number, w
 
     ctx.closePath();
 
-    ctx.stroke();
+    //ctx.strokeStyle = "#111111"; 
+    //ctx.stroke();
 
 }
 
@@ -159,4 +159,20 @@ export function drawPixelNumbers(ctx: CanvasRenderingContext2D, numstr: string, 
     }
 
 
+}
+
+export function drawX(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, side_length: number): void {
+    ctx.strokeStyle = color;
+    let offset = 12;
+    ctx.beginPath();
+    ctx.lineWidth = 5;
+    ctx.moveTo(x+offset,y+offset);
+    ctx.lineTo(x+side_length-offset, y+side_length-offset);
+    ctx.stroke();
+    ctx.moveTo(x+side_length-offset, y+offset);
+    ctx.lineTo(x+offset, y+side_length-offset);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.lineWidth = 0;
+    
 }

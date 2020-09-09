@@ -3,5 +3,6 @@
     "col":6,
     "blocks":[],
     "tile_cords":[[2,2],[4,2]],
-    "tile_values":[202, 202]
+    "tile_values":[202, 202],
+    "holes":[[4, 0]]
 }

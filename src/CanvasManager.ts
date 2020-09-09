@@ -6,11 +6,13 @@
 import {Level} from "./level_parser.ts";
 import {INPUT} from "./InputManager.ts";
 import {
-    Block, Tile, Hole, Entity, EntityRequest, 
+    Entity, EntityRequest, 
     RequestType, ResponseType, EntityResponse,
     EntityType
-} from "./entity.ts";
-
+} from "./entities/entity.ts";
+import {Block} from "./entities/block.ts";
+import {Tile} from "./entities/tile.ts";
+import {Hole} from "./entities/hole.ts";
 // Should be responsible for keeping track of all entities
 /* The game-logic reolves around entities within game managers we control via messages.*/
 
@@ -48,7 +50,7 @@ export class CanvasManager {
         if (lvl.blocks){
             for (let i=0; i < lvl.blocks.length; i++){
                 pos = [lvl.blocks[i][0], lvl.blocks[i][1]];
-                console.log(`Adding new block @ ${pos[0]}, ${pos[1]}`)
+                //console.log(`Adding new block @ ${pos[0]}, ${pos[1]}`)
 
                 CanvasManager.entity_pool.push(new Block(pos));
             }
@@ -56,7 +58,7 @@ export class CanvasManager {
         // add tiles
         for (let i = 0; i < lvl.tile_values.length; i++){
             pos = [lvl.tile_cords[i][0], lvl.tile_cords[i][1]];
-            console.log(`Adding new tile @ ${pos[0]}, ${pos[1]}`)
+            //console.log(`Adding new tile @ ${pos[0]}, ${pos[1]}`)
 
             CanvasManager.entity_pool.push(new Tile(pos, lvl.tile_values[i]));
         }
@@ -99,7 +101,10 @@ export class CanvasManager {
 
     use_input(){
         const input : INPUT = this.input_queue.shift();
-        // filter items
+        /* sort the entity pool as to make sure collisions happen in an expected and reliable order
+           this probably reduces performance quite a bit however it makes sure that if we have
+           the following tiles collide: [50] [50] [50] we get the same result of [50] [100] each time.
+        */ 
         switch(input){
             case INPUT.UP:
                 CanvasManager.entity_pool.sort( (e1, e2) => e1.coordinates[1] - e2.coordinates[1] );
@@ -118,15 +123,15 @@ export class CanvasManager {
 
         for (let i=0; i < CanvasManager.entity_pool.length; i++){
          let resp : EntityResponse = CanvasManager.entity_pool[i].ask({type:RequestType.Move, dir:input});
-            // maybe do something with response idk
+            // possibly add some side-effect mechanic here depending on the entity response.
         }
 
     }
 
-    // Draws the current entity pool
     draw(){
-        // clear the screen
+        // Clear the screen
         this.cls();
+        // Draw each entity
         for (let i=0; i < CanvasManager.entity_pool.length; i++){
             CanvasManager.entity_pool[i].draw(CanvasManager.context);
         }
@@ -147,18 +152,17 @@ export class CanvasManager {
         return false;
     }
 
+    // Returns -1 if no entity exists at coordinate.  Otherwise returns the index of the entity.
     static entityAt(x: number, y: number): number{
         for (let i=0; i < CanvasManager.entity_pool.length; i++){
-            //if (CanvasManager.entity_pool[i].ask({type:RequestType.ID}) == {type:ResponseType.ID, success_value:e_type}){
                 if (CanvasManager.entity_pool[i].coordinates[0] == x && CanvasManager.entity_pool[i].coordinates[1] == y){
                     return i;
                 }
-            //}
         }
         return -1;
     }
 
-    // [x, y]
+    // checks if the given [x, y] exceeds the limitations of the game field.
     static checkBorderCollision(cords: [number, number]): boolean{
         //console.log(`grid_w = ${CanvasManager.grid_width}, grid_h = ${CanvasManager.grid_height}`);
         //console.log(`cords = ${cords[0]}, ${cords[1]}`);
@@ -178,4 +182,3 @@ export class CanvasManager {
 
 }
 
-// An external function or object should be calling a event loop where the Canvas Manager step() && draw() events get called.
