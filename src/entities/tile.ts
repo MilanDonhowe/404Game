@@ -2,7 +2,7 @@
 
 import {INPUT} from "../InputManager.ts";
 import {CanvasManager} from "../CanvasManager.ts";
-import {fillRoundRect, drawPixelNumbers, drawX} from "../shape.ts";
+import {fillRoundRect, drawPixelFont, drawX} from "../shape.ts";
 import {GameManager, GameState} from "../GameManager.ts";
 import {Block} from "./block.ts";
 import {EntityRequest, EntityResponse, EntityType, RequestType, ResponseType, BLOCK_SIZE, colors} from "./entity.ts";
@@ -44,7 +44,7 @@ export class Tile extends Block {
     draw(ctx: CanvasRenderingContext2D): void {
         fillRoundRect(ctx, this.coordinates[0], this.coordinates[1], BLOCK_SIZE, BLOCK_SIZE, colors[this.score]);
         const p_size = 3;
-        drawPixelNumbers(ctx, String(this.score), this.coordinates[0]+14, this.coordinates[1]+24, p_size);
+        drawPixelFont(ctx, String(this.score), this.coordinates[0]+14, this.coordinates[1]+24, p_size);
     }
 
     constructor(pos : [number, number], points: number){

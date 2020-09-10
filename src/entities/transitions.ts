@@ -1,7 +1,7 @@
 /* Transition Objects */
 
 import {CanvasManager} from "../CanvasManager.ts";
-import {fillRoundRect, drawPixelNumbers, drawX} from "../shape.ts";
+import {fillRoundRect, drawX} from "../shape.ts";
 import {GameManager, GameState} from "../GameManager.ts";
 import {Entity, EntityRequest, EntityResponse, ResponseType} from "./entity.ts";
 

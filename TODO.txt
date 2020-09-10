@@ -1,10 +1,12 @@
   ________________________
  /------------------------\
-/-<{Actions for Thursday}>-\
+/-<{Actions for Project }>-\
 \__________________________/
 
-\-> Add Hole Game-Over mechanics
-\-> Add Win-Screen
-|-> Add Lose-Screen
-/-> Further Modularize entities (maybe a seperate folder)
-/-> Add audio.
+[ ] --> Add Splash Screen
+[ ] --> Add Audio
+[ ] --> Add Touch Screen Controls
+[ ] --> Add Levels 
+[ ] --> Add End Screen 
+[ ] --> Add Level Transition Text
+[ ] --> Submit Project

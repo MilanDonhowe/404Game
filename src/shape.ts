@@ -40,16 +40,16 @@ export function fillRoundRect(ctx: CanvasRenderingContext2D, x: number, y: numbe
     ctx.fill();
 }
 
-// okay... maybe use pixel font?
 
-// Truncated Pixel Font from https://github.com/PaulBGD/PixelFont
 
 interface boolArrDict {
     [index: string]: number[][];
 }
 
-const NumericFont : boolArrDict = {
-        '.':[
+
+/* PixelFont by PaulBGD @ GitHub */
+const PixelFont : boolArrDict = {
+    '.':[
             [,],
             [,],
             [,],
@@ -125,17 +125,215 @@ const NumericFont : boolArrDict = {
             [1,1,1],
             [,,1],
             [1,1,1]
+        ],
+        'A': [
+            [, 1],
+            [1, , 1],
+            [1, , 1],
+            [1, 1, 1],
+            [1, , 1]
+        ],
+        'B': [
+            [1, 1],
+            [1, , 1],
+            [1, 1, 1],
+            [1, , 1],
+            [1, 1]
+        ],
+        'C': [
+            [1, 1, 1],
+            [1],
+            [1],
+            [1],
+            [1, 1, 1]
+        ],
+        'D': [
+            [1, 1],
+            [1, , 1],
+            [1, , 1],
+            [1, , 1],
+            [1, 1]
+        ],
+        'E': [
+            [1, 1, 1],
+            [1],
+            [1, 1, 1],
+            [1],
+            [1, 1, 1]
+        ],
+        'F': [
+            [1, 1, 1],
+            [1],
+            [1, 1],
+            [1],
+            [1]
+        ],
+        'G': [
+            [, 1, 1,,],
+            [1,,],
+            [1, , 1, 1,,],
+            [1, , , 1,,],
+            [, 1, 1,,]
+        ],
+        'H': [
+            [1, , 1],
+            [1, , 1],
+            [1, 1, 1],
+            [1, , 1],
+            [1, , 1]
+        ],
+        'I': [
+            [1, 1, 1],
+            [, 1],
+            [, 1],
+            [, 1],
+            [1, 1, 1]
+        ],
+        'J': [
+            [1, 1, 1],
+            [, , 1],
+            [, , 1],
+            [1, , 1],
+            [1, 1, 1]
+        ],
+        'K': [
+            [1, , , 1],
+            [1, , 1],
+            [1, 1],
+            [1, , 1],
+            [1, , , 1]
+        ],
+        'L': [
+            [1],
+            [1],
+            [1],
+            [1],
+            [1, 1, 1]
+        ],
+        'M': [
+            [1, 1, 1, 1, 1],
+            [1, , 1, , 1],
+            [1, , 1, , 1],
+            [1, , , , 1],
+            [1, , , , 1]
+        ],
+        'N': [
+            [1, , , 1],
+            [1, 1, , 1],
+            [1, , 1, 1],
+            [1, , , 1],
+            [1, , , 1]
+        ],
+        'O': [
+            [1, 1, 1],
+            [1, , 1],
+            [1, , 1],
+            [1, , 1],
+            [1, 1, 1]
+        ],
+        'P': [
+            [1, 1, 1,],
+            [1, , 1,],
+            [1, 1, 1,],
+            [1,,,],
+            [1,,,]
+        ],
+        'Q': [
+            [0, 1, 1],
+            [1, , , 1],
+            [1, , , 1],
+            [1, , 1, 1],
+            [1, 1, 1, 1]
+        ],
+        'R': [
+            [1, 1],
+            [1, , 1],
+            [1, , 1],
+            [1, 1],
+            [1, , 1]
+        ],
+        'S': [
+            [1, 1, 1],
+            [1],
+            [1, 1, 1],
+            [, , 1],
+            [1, 1, 1]
+        ],
+        'T': [
+            [1, 1, 1],
+            [, 1],
+            [, 1],
+            [, 1],
+            [, 1]
+        ],
+        'U': [
+            [1, , 1],
+            [1, , 1],
+            [1, , 1],
+            [1, , 1],
+            [1, 1, 1]
+        ],
+        'V': [
+            [1, , , , 1],
+            [1, , , , 1],
+            [, 1, , 1],
+            [, 1, , 1],
+            [, , 1]
+        ],
+        'W': [
+            [1, , , , 1],
+            [1, , , , 1],
+            [1, , , , 1],
+            [1, , 1, , 1],
+            [1, 1, 1, 1, 1]
+        ],
+        'X': [
+            [1, , , , 1],
+            [, 1, , 1],
+            [, , 1],
+            [, 1, , 1],
+            [1, , , , 1]
+        ],
+        'Y': [
+            [1, , 1],
+            [1, , 1],
+            [, 1],
+            [, 1],
+            [, 1]
+        ],
+        'Z': [
+            [1, 1, 1, 1, 1],
+            [, , , 1],
+            [, , 1],
+            [, 1],
+            [1, 1, 1, 1, 1]
+        ],
+        ' ': [
+            [, ,],
+            [, ,],
+            [, ,],
+            [, ,],
+            [, ,]
+        ],
+        ':':[
+            [1,],
+            [,],
+            [,],
+            [,],
+            [1,],
         ]
 }
 
-export function drawPixelNumbers(ctx: CanvasRenderingContext2D, numstr: string, x: number, y: number, block_size: number){
-    const num_color = "#161616";
-    ctx.fillStyle = num_color;
+export function drawPixelFont(ctx: CanvasRenderingContext2D, str: string, x: number, y:number, block_size:number, color_str: string = "#161616"){
+    //const num_color = "#161616";
+    ctx.fillStyle = color_str; //num_color;
     let x_cord = x;
     let x_inter = x;
+    
+    let sentence : string = str.toUpperCase();
 
-    for (let i=0; i < numstr.length; i++){
-        let pxlArr : number[][] = NumericFont[numstr[i]];
+    for (let i=0; i < str.length; i++){
+        let pxlArr : number[][] = PixelFont[sentence[i]];
         let y_cord = y;
         x_cord = x_inter;
         
@@ -158,8 +356,9 @@ export function drawPixelNumbers(ctx: CanvasRenderingContext2D, numstr: string, 
 
     }
 
-
 }
+
+
 
 export function drawX(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, side_length: number): void {
     ctx.strokeStyle = color;
